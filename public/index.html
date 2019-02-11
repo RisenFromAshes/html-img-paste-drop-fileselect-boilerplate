@@ -50,16 +50,21 @@
                 console.log('... file[' + i + '].name = ' + files[i].name);
                 var formData = new FormData()
                 formData.append('image'+i, files[i])
-                $.ajax({
+
+                let sendRequest = ()=>{
+                    $.ajax({
                     type: "post",
                     url: "/upload",
                     data: formData,
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                        console.log(response)
-                    }
-                });
+                            if(response.status != 'success') sendRequest()
+                        }
+                    })
+                }
+
+                sendRequest()
             }
         }
 

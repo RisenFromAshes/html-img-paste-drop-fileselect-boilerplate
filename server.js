@@ -20,9 +20,16 @@ app.post('/upload', (req, res) => {
         //setting the new directory //directory has to be made prior to this
         var newpath = __dirname + '/uploads/' + uuidv1() + file.name
         //renaming which is the same as moving from one directory to another
+
+        //setting 10 second timeout just in case request fails
+        var timeout = setTimeout(()=>{
+            res.json({status:'error'})
+        }, 10000)
+
         fs.rename(oldpath,newpath,(err)=>{
-            if(err) return console.log(err)
-            console.log('File uploaded and moved')
+            if(err) return res.json({status: 'error'})            
+            clearTimeout(timeout)
+            res.json({status:'success'})
         })
 
     })
