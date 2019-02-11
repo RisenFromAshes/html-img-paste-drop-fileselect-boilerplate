@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+</head>
+
+<body>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+
+    <div class="container w-100 py-4 justify-content-center align-content-center" id="container">
+        <div id="drop_zone" class="w-50 border border-primary"
+            style="height: 100px">
+            Drop Your Images here
+            <textarea id="pasteArea" placeholder="Paste Image Here"  style="width:100%"></textarea>
+        </div>
+        <input type="file" multiple accept="image/*" style="display:none; position:absolute" id="fileInput">
+        <a href="#" id="fileSelector">Select some files</a>
+    </div>
+
+    <script>
+
+        //a function which takes a file array, iterates through it
+        //it creates urls for the dropped/selected files and uses that url to render it to the dom and then unlink the url once the image loads
+        //it sends an ajax request after encoding the file as formdata
+        //contenttype and processdata has to be set to false cause other wise jquery sets bad contenttypes or tries to parse the data as string
+        function handlefiles(files){
+            for (var i = 0; i < files.length; i++) {
+                
+                var src = window.URL.createObjectURL(files[i])
+                var img = $('<img>').width(100).prop('src', src).on('load', function () {
+                    console.log(this.src)
+                    window.URL.revokeObjectURL(this.src)
+                })
+                $('#container').append(img);
+                console.log('... file[' + i + '].name = ' + files[i].name);
+                var formData = new FormData()
+                formData.append('image'+i, files[i])
+                $.ajax({
+                    type: "post",
+                    url: "/upload",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        console.log(response)
+                    }
+                });
+            }
+        }
+
+        $(document).ready(() => {
+            //jquery doesnt support dragdrop events, so vanilla js here
+            var dropZone = document.getElementById('drop_zone')
+
+            dropZone.ondragover = (ev)=>{
+                ev.preventDefault()
+            }
+
+            dropZone.ondrop = (ev)=>{
+                ev.preventDefault()
+                if(ev.dataTransfer && ev.dataTransfer.files.length > 0)
+                    handlefiles(ev.dataTransfer.files)
+            }
+
+            //redirect a click to invisible file input
+            $('#fileSelector').click(() => {
+                $('#fileInput').click()
+            })
+            //on files being selected pass in the array
+            $('#fileInput').on('change', (ev) => {
+                if (ev.target && ev.target.files.length > 0)
+                    handlefiles(ev.target.files)
+            })
+            //on pasting check the clipboarddata and pass in the files
+            $('#pasteArea').on('paste', function (event) {
+                var files = (event.clipboardData || event.originalEvent.clipboardData).files;
+                if (files.length > 0)
+                    handlefiles(files)
+            })
+        })
+    </script>
+
+</body>
+
+
+</html>
