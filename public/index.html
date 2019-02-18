@@ -23,10 +23,10 @@
         crossorigin="anonymous"></script>
 
     <div class="container w-100 py-4 justify-content-center align-content-center" id="container">
-        <div id="drop_zone" class="w-50 border border-primary"
-            style="height: 100px">
+        <div id="drop_zone" class="w-auto border border-primary"
+            style="height: auto">
             Drop Your Images here
-            <textarea id="pasteArea" placeholder="Paste Image Here"  style="width:100%"></textarea>
+            <div contenteditable="true" id="pasteArea" class="border border-primary bg-info text-white" style="width:auto; z-index: 1000;">Enter something here</div>
         </div>
         <input type="file" multiple accept="image/*" style="display:none; position:absolute" id="fileInput">
         <a href="#" id="fileSelector">Select some files</a>
@@ -53,16 +53,25 @@
                 formData.append('image'+i, files[i])
 
                 let sendRequest = ()=>{
-                    $.ajax({
-                    type: "post",
-                    url: "/upload",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
-                            if(response.status != 'success') sendRequest()
-                        }
+                    // $.ajax({
+                    // type: "post",
+                    // url: "/upload",
+                    // data: formData,
+                    // contentType: false,
+                    // processData: false,
+                    // success: function (response) {
+                    //         if(response.status != 'success') sendRequest()
+                    //     }
+                    // })
+                    fetch('/upload',{
+                        method: 'POST',
+                        body: formData
                     })
+                    .then(res=>res.json())
+                    .then(res=>{
+                        if(res.status != 'success') sendRequest()
+                    })
+                    .catch(e=>sendRequest())
                 }
 
                 sendRequest()

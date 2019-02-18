@@ -65,11 +65,23 @@
     <script src="socket.io/socket.io.js"></script>
 
     <script>
+        
+        function getImageDimensions(imgsrc, callback){
+            let thisImage = new Image()
+            thisImage.src = imgsrc
+            thisImage.onload = function(){
+                callback({
+                    height : thisImage.height,
+                    width : thisImage.width
+                })
+            }            
+        }
         function renderimg(imgdata){
             var img = $('<img>').width(100).addClass('image').prop('src', imgdata.src).on('click',function(){
                 $('#previewImage').prop('src', this.src)
                 $('#modelId').modal('toggle')
             })
+            getImageDimensions(imgdata.src, (dimensions) => console.log(dimensions))
             $('#container').append(img);
         }
         var socket = io(window.location.origin)
