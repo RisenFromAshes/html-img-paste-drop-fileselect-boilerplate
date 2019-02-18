@@ -50,7 +50,7 @@
                 $('#container').append(img);
                 console.log('... file[' + i + '].name = ' + files[i].name);
                 var formData = new FormData()
-                formData.append('image'+i, files[i])
+                formData.append('image', files[i])
 
                 let sendRequest = ()=>{
                     // $.ajax({
@@ -69,7 +69,11 @@
                     })
                     .then(res=>res.json())
                     .then(res=>{
+                        console.log(res)
                         if(res.status != 'success') sendRequest()
+                        else {
+                            return console.log('done')
+                        }
                     })
                     .catch(e=>sendRequest())
                 }
