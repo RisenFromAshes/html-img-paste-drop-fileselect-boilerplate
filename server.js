@@ -11,11 +11,12 @@ const imageUploadStorage = multer.diskStorage({
         callback(null,__dirname+'/multer_uploads')
     },
     filename: (req,file,callback)=>{
-        callback(null, uuidv1() + file.originalname)
+        req.fileName = uuidv1() + file.originalname
+        callback(null, req.fileName)
     }
 })
 const imageUpload = multer({storage: imageUploadStorage})
-const imageMiddleWare = imageUpload.fields([{name:'image', maxCount: Infinity}])
+const imageMiddleWare = imageUpload.fields([{name:'image', maxCount: 1}])
 
 const app = express()
 const server = app.listen(80)
@@ -42,7 +43,8 @@ app.get('/gallery', (req,res)=>{
 })
 
 app.post('/upload', imageMiddleWare,(req, res) => {
-    res.json({status:'success'})
+    let response = {status:'success', fileName: req.fileName}
+    res.json(response)
 })
 
 

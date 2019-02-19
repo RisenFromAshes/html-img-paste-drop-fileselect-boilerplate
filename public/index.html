@@ -44,11 +44,11 @@
                 
                 var src = window.URL.createObjectURL(files[i])
                 var img = $('<img>').width(100).prop('src', src).on('load', function () {
-                    console.log(this.src)
+                    //onsole.log(this.src)
                     window.URL.revokeObjectURL(this.src)
                 })
                 $('#container').append(img);
-                console.log('... file[' + i + '].name = ' + files[i].name);
+                //console.log('... file[' + i + '].name = ' + files[i].name);
                 var formData = new FormData()
                 formData.append('image', files[i])
 
